@@ -1,0 +1,10 @@
+.data
+.next
+node_modules
+prisma/*.db
+prisma/data
+.env
+.env.*
+!.env.example
+*.bak
+album promte.txt

@@ -39,8 +39,10 @@ function pageKind(type: BookPage["type"]) {
   return "Photo page";
 }
 
-function idsFromPage(page: BookPage) {
-  return page.images.map((image) => image?.id ?? "");
+function photoPreviewSrc(photo: LibraryPhoto | { url: string; thumbnailUrl?: string | null; blobUrl?: string }) {
+  if ("blobUrl" in photo && photo.blobUrl) return photo.thumbnailUrl || photo.blobUrl;
+  if ("url" in photo && photo.url) return photo.thumbnailUrl || photo.url;
+  return photo.thumbnailUrl || "";
 }
 
 export function AlbumEditor({
@@ -515,7 +517,7 @@ export function AlbumEditor({
                                 <div className="relative h-full w-full">
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
                                   <img
-                                    src={"thumbnailUrl" in photo ? photo.thumbnailUrl || ("blobUrl" in photo ? photo.blobUrl : photo.url) : photo.url}
+                                    src={photoPreviewSrc(photo)}
                                     alt=""
                                     className="h-full w-full object-cover"
                                   />
