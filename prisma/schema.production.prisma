@@ -1,0 +1,84 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Section {
+  id          String      @id @default(cuid())
+  slug        String      @unique
+  title       String
+  subtitle    String?
+  description String?
+  sortOrder   Int         @default(0)
+  photos      Photo[]
+  pages       AlbumPage[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Photo {
+  id           String   @id @default(cuid())
+  blobUrl      String
+  thumbnailUrl String?
+  filename     String
+  width        Int
+  height       Int
+  orientation  String
+  aspectRatio  Float
+  fileSize     Int?
+  mimeType     String?
+  sectionId    String
+  sortOrder    Int      @default(0)
+  caption      String?
+  isHero       Boolean  @default(false)
+  offsetX      Float    @default(0)
+  offsetY      Float    @default(0)
+  scale        Float    @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  section      Section  @relation(fields: [sectionId], references: [id], onDelete: Restrict)
+
+  @@index([sectionId, sortOrder])
+}
+
+model Album {
+  id             String      @id @default(cuid())
+  status         String
+  version        Int         @default(1)
+  coverPhotoId   String?
+  closingPhotoId String?
+  notes          String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  pages          AlbumPage[]
+
+  @@index([status])
+}
+
+model AlbumPage {
+  id               String   @id @default(cuid())
+  albumId          String
+  sectionId        String?
+  pageNumber       Int
+  layoutType       String
+  imageIds         String
+  caption          String?
+  showPageNumber   Boolean  @default(true)
+  isManuallyEdited Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  album            Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  section          Section? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+
+  @@index([albumId, pageNumber])
+}
+
+model Setting {
+  id    String @id
+  value String
+}
