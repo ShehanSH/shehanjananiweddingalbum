@@ -152,6 +152,11 @@ export async function generateDraftAlbum(options: {
     );
 
     for (const page of merged) {
+      const extra = page as {
+        caption?: string | null;
+        showPageNumber?: boolean;
+        isManuallyEdited?: boolean;
+      };
       const record = await prisma.albumPage.create({
         data: {
           albumId: created.id,
@@ -159,9 +164,9 @@ export async function generateDraftAlbum(options: {
           pageNumber,
           layoutType: page.layout,
           imageIds: serializeImageIds(page.images.map((image) => image.id)),
-          caption: "caption" in page ? page.caption : null,
-          showPageNumber: "showPageNumber" in page ? Boolean(page.showPageNumber) : true,
-          isManuallyEdited: "isManuallyEdited" in page ? Boolean(page.isManuallyEdited) : false,
+          caption: extra.caption ?? null,
+          showPageNumber: extra.showPageNumber ?? true,
+          isManuallyEdited: extra.isManuallyEdited ?? false,
         },
       });
       createdPages.push(record);

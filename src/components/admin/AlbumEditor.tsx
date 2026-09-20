@@ -39,6 +39,10 @@ function pageKind(type: BookPage["type"]) {
   return "Photo page";
 }
 
+function idsFromPage(page: BookPage) {
+  return page.images.map((image) => image?.id ?? "");
+}
+
 function photoPreviewSrc(photo: LibraryPhoto | { url: string; thumbnailUrl?: string | null; blobUrl?: string }) {
   if ("blobUrl" in photo && photo.blobUrl) return photo.thumbnailUrl || photo.blobUrl;
   if ("url" in photo && photo.url) return photo.thumbnailUrl || photo.url;
