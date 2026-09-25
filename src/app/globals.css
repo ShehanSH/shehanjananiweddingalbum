@@ -845,51 +845,38 @@ a {
   }
 
   .album-nav-wrap {
-    position: static;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 9;
     margin: 0;
-    padding: 0;
+    padding: 0.45rem 0.75rem calc(0.55rem + env(safe-area-inset-bottom));
     background: none;
-    pointer-events: none;
+  }
+
+  .album-nav {
+    gap: 1rem;
   }
 
   .album-nav-btn {
-    position: absolute;
-    top: 50%;
-    z-index: 9;
     display: flex;
     height: 3rem;
     width: 3rem;
-    transform: translateY(-50%);
     align-items: center;
     justify-content: center;
     border: 0;
     background: color-mix(in srgb, var(--brown) 90%, black);
     color: var(--ivory);
     box-shadow: 0 6px 18px rgba(36, 22, 16, 0.35);
-    pointer-events: auto;
-  }
-
-  .album-nav-prev {
-    left: 0.55rem;
-  }
-
-  .album-nav-next {
-    right: 0.55rem;
   }
 
   .album-nav-count {
-    position: absolute;
-    bottom: calc(0.75rem + env(safe-area-inset-bottom));
-    left: 50%;
-    z-index: 9;
     min-width: 4.5rem;
-    transform: translateX(-50%);
     border-radius: 999px;
     background: color-mix(in srgb, var(--brown) 82%, black);
     padding: 0.32rem 0.75rem;
     color: var(--ivory);
-    pointer-events: none;
   }
 
   .album-layout,
