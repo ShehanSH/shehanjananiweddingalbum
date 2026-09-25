@@ -264,9 +264,9 @@ export function AlbumBook({
   return (
     <div
       ref={stageRef}
-      className="paper-canvas min-h-dvh overflow-x-hidden px-3 py-3 sm:px-6 sm:py-6"
+      className="album-shell paper-canvas min-h-dvh overflow-x-hidden px-3 py-3 sm:px-6 sm:py-6"
     >
-      <header className="mx-auto mb-3 flex w-full max-w-6xl min-w-0 items-center justify-between gap-2 text-brown sm:mb-4">
+      <header className="album-header mx-auto mb-3 flex w-full max-w-6xl min-w-0 items-center justify-between gap-2 text-brown sm:mb-4">
         <button
           type="button"
           onClick={() => setToc(true)}
@@ -316,7 +316,7 @@ export function AlbumBook({
       ) : null}
 
       <div
-        className="mx-auto w-full max-w-6xl touch-pan-y"
+        className="album-stage-wrap mx-auto w-full max-w-6xl touch-pan-y"
         onTouchStart={(event) => {
           if (isAlbumInteractTarget(event.target)) {
             touchStart.current = null;
@@ -358,7 +358,7 @@ export function AlbumBook({
         />
       </div>
 
-      <div className="mx-auto mt-5 max-w-6xl">
+      <div className="album-nav-wrap mx-auto mt-5 max-w-6xl">
         <AlbumNavigation
           current={displayCurrent}
           total={displayTotal}

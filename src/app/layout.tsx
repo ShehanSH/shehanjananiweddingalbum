@@ -21,6 +21,12 @@ const sans = Outfit({
   variable: "--font-couple-sans",
 });
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+};
+
 export const metadata: Metadata = {
   title: SITE.title,
   description: SITE.description,

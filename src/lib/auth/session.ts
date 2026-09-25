@@ -6,13 +6,18 @@ import {
   isValidSessionToken,
 } from "./token";
 
+function normalizeSecret(value: string) {
+  return value.trim().replace(/^["']|["']$/g, "");
+}
+
 export function verifyAdminPassword(password: string) {
-  const expected = process.env.ADMIN_PASSWORD || "";
-  if (!expected || !password) return false;
-  if (expected.length !== password.length) return false;
+  const expected = normalizeSecret(process.env.ADMIN_PASSWORD || "");
+  const given = normalizeSecret(password);
+  if (!expected || !given) return false;
+  if (expected.length !== given.length) return false;
   let mismatch = 0;
   for (let i = 0; i < expected.length; i += 1) {
-    mismatch |= expected.charCodeAt(i) ^ password.charCodeAt(i);
+    mismatch |= expected.charCodeAt(i) ^ given.charCodeAt(i);
   }
   return mismatch === 0;
 }
