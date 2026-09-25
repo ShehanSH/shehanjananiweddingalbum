@@ -789,50 +789,73 @@ a {
 
 @media (max-width: 640px) {
   .album-shell {
-    display: flex;
-    flex-direction: column;
+    position: relative;
+    display: block;
+    height: 100dvh;
     height: 100svh;
+    min-height: 100dvh;
     min-height: 100svh;
+    max-height: 100dvh;
     max-height: 100svh;
-    padding: 0.35rem 0.45rem calc(0.4rem + env(safe-area-inset-bottom));
+    padding: 0;
     overflow: hidden;
   }
 
   .album-header {
-    margin-bottom: 0.3rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 8;
+    margin: 0;
+    padding: 0.55rem 0.75rem;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ivory) 88%, transparent), transparent);
   }
 
   .album-stage-wrap {
-    display: flex;
-    flex: 1 1 auto;
-    align-items: center;
-    justify-content: center;
-    min-height: 0;
+    position: absolute;
+    inset: 0;
+    display: block;
     width: 100%;
+    height: 100%;
+    min-height: 0;
   }
 
   .album-stage-wrap .book-stage {
-    height: 100%;
     width: 100%;
+    height: 100%;
     --book-max-h: 100%;
-    align-items: center;
   }
 
   .book-cover-wrap,
-  .book-single {
-    width: min(100%, calc(var(--book-max-h) * 0.75));
-    max-height: 100%;
+  .book-single,
+  .book-spread {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    aspect-ratio: auto;
+    margin: 0;
+  }
+
+  .book-cover-shadow,
+  .book-cover-board,
+  .book-body {
+    box-shadow: none;
   }
 
   .album-nav-wrap {
-    margin-top: 0.4rem;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 8;
+    margin: 0;
+    padding: 0.35rem 0.5rem calc(0.4rem + env(safe-area-inset-bottom));
+    background: linear-gradient(0deg, color-mix(in srgb, var(--ivory) 92%, transparent), transparent);
   }
 
-  .album-layout {
-    padding: 0.42rem;
-    gap: 0.32rem;
-  }
-
+  .album-layout,
   .album-layout.HERO_PORTRAIT,
   .album-layout.HERO_LANDSCAPE,
   .album-layout.WHITE_SPACE_EDITORIAL,
@@ -840,10 +863,13 @@ a {
   .album-layout.TWO_LANDSCAPES,
   .album-layout.LARGE_PLUS_SMALL,
   .album-layout.ASYMMETRIC_EDITORIAL {
-    padding: 0.5rem;
+    padding: 0.2rem;
+    gap: 0.18rem;
   }
 
-  .album-layout .photo-frame img {
+  .album-layout .photo-frame img,
+  .album-cover-photo .photo-frame,
+  .album-cover-photo .photo-frame img {
     width: 100%;
     height: 100%;
     max-width: none;
@@ -851,8 +877,52 @@ a {
     object-fit: cover;
   }
 
+  .album-cover-page {
+    justify-content: flex-end;
+    padding: 4.8rem 1.1rem 5.6rem;
+  }
+
+  .album-cover-page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--paper) 38%, transparent) 0%,
+      transparent 26%,
+      transparent 48%,
+      color-mix(in srgb, var(--paper) 84%, transparent) 100%
+    );
+  }
+
+  .album-cover-page > *:not(.album-cover-photo) {
+    position: relative;
+    z-index: 2;
+  }
+
+  .album-cover-page .album-cover-photo {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+  }
+
+  .album-cover-page h1,
+  .album-cover-page p {
+    text-shadow: 0 1px 10px color-mix(in srgb, var(--paper) 70%, transparent);
+  }
+
+  .album-cover-photo .photo-zoom-controls {
+    display: none;
+  }
+
   .book-open-button {
-    bottom: 0.75rem;
+    bottom: 4.6rem;
     padding: 0.55rem 0.95rem;
     font-size: 0.56rem;
   }

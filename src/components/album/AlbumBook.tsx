@@ -264,7 +264,7 @@ export function AlbumBook({
   return (
     <div
       ref={stageRef}
-      className="album-shell paper-canvas min-h-dvh overflow-x-hidden px-3 py-3 sm:px-6 sm:py-6"
+      className="album-shell paper-canvas min-h-dvh overflow-x-hidden px-0 py-0 sm:px-6 sm:py-6"
     >
       <header className="album-header mx-auto mb-3 flex w-full max-w-6xl min-w-0 items-center justify-between gap-2 text-brown sm:mb-4">
         <button
@@ -307,7 +307,7 @@ export function AlbumBook({
       </header>
 
       {editable ? (
-        <p className="mx-auto mb-3 max-w-6xl text-center text-[10px] tracking-[0.16em] uppercase text-brown-soft sm:text-[11px]">
+        <p className="mx-auto mb-3 hidden max-w-6xl text-center text-[10px] tracking-[0.16em] uppercase text-brown-soft sm:mb-3 sm:block sm:text-[11px]">
           Drop photographs onto a marked area · Use +/−, the slider, scroll, pinch, or double-click to zoom · Drag to place · Tap the trash icon to delete
         </p>
       ) : null}
