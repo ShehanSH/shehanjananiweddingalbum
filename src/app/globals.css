@@ -402,16 +402,8 @@ a {
   border-radius: 999px;
   background: color-mix(in srgb, var(--paper) 88%, var(--brown));
   box-shadow: 0 2px 10px rgba(92, 64, 51, 0.18);
-  opacity: 0;
-  pointer-events: auto;
-  transition: opacity 160ms ease;
-}
-
-.photo-frame.is-interactive:hover .photo-zoom-controls,
-.photo-frame.is-interactive:focus-within .photo-zoom-controls,
-.photo-frame.is-interactive.is-active .photo-zoom-controls,
-.photo-frame.is-dragging .photo-zoom-controls {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .photo-zoom-controls button {
@@ -455,10 +447,6 @@ a {
 }
 
 @container (max-width: 168px) {
-  .photo-frame.is-interactive .photo-zoom-controls {
-    opacity: 1;
-  }
-
   .photo-zoom-slider,
   .photo-zoom-value {
     display: none;
@@ -467,18 +455,6 @@ a {
   .photo-zoom-controls button {
     height: 1.85rem;
     width: 1.85rem;
-  }
-}
-
-@container (max-width: 132px) {
-  .photo-zoom-controls button:last-of-type {
-    display: none;
-  }
-}
-
-@container (max-height: 120px) {
-  .photo-frame.is-interactive .photo-zoom-controls {
-    opacity: 1;
   }
 }
 
@@ -985,10 +961,6 @@ a {
     letter-spacing: 0.22em;
     background: color-mix(in srgb, var(--paper) 88%, white);
     box-shadow: 0 4px 16px rgba(36, 22, 16, 0.18);
-  }
-
-  .album-cover-photo .photo-zoom-controls {
-    display: none;
   }
 
   .book-open-button {

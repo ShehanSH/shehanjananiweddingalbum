@@ -3,15 +3,22 @@
 import type { BookPhoto } from "@/lib/database/book";
 import {
   clampPlacement,
+  MAX_PHOTO_SCALE,
+  MIN_PHOTO_SCALE,
   normalizePlacement,
   type PhotoPlacement,
 } from "@/lib/album/photoPlacement";
 import { cn } from "@/lib/utils";
-import { Trash2 } from "lucide-react";
+import { Minus, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+const ZOOM_STEP = 0.2;
+const DEFAULT_PLACEMENT: PhotoPlacement = { offsetX: 0, offsetY: 0, scale: 1 };
+
 function isPhotoControl(target: EventTarget | null) {
-  return Boolean(target instanceof Element && target.closest("button, .photo-delete"));
+  return Boolean(
+    target instanceof Element && target.closest("button, input, .photo-zoom-controls, .photo-delete"),
+  );
 }
 
 export function PhotoFrame({
@@ -33,6 +40,7 @@ export function PhotoFrame({
   const [failed, setFailed] = useState(false);
   const [placement, setPlacement] = useState(() => normalizePlacement(photo));
   const [dragging, setDragging] = useState(false);
+  const [active, setActive] = useState(false);
   const frameRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
     x: number;
@@ -71,15 +79,35 @@ export function PhotoFrame({
     if (persist) onTransformRef.current?.(photo.id, clamped);
   }
 
+  function nudgeZoom(delta: number) {
+    commit({ ...latest.current, scale: latest.current.scale + delta });
+  }
+
+  function resetPlacement() {
+    commit(DEFAULT_PLACEMENT);
+  }
+
+  function stopControlGesture(event: React.SyntheticEvent) {
+    event.stopPropagation();
+  }
+
   return (
     <div
       ref={frameRef}
+      tabIndex={canEdit ? 0 : undefined}
       data-album-interact={canEdit ? "true" : undefined}
-      className={cn("photo-frame group", canEdit && "is-interactive", dragging && "is-dragging", className)}
+      className={cn(
+        "photo-frame group",
+        canEdit && "is-interactive",
+        dragging && "is-dragging",
+        active && "is-active",
+        className,
+      )}
       onPointerDown={(event) => {
         if (!canEdit || isPhotoControl(event.target)) return;
         if (event.pointerType === "mouse" && event.button !== 0) return;
         event.stopPropagation();
+        setActive(true);
         frameRef.current?.setPointerCapture(event.pointerId);
         dragRef.current = {
           x: event.clientX,
@@ -128,6 +156,27 @@ export function PhotoFrame({
           scale: current >= 2.2 ? 1 : current + 0.45,
         });
       }}
+      onKeyDown={(event) => {
+        if (!canEdit) return;
+        if (event.key === "+" || event.key === "=") {
+          event.preventDefault();
+          event.stopPropagation();
+          nudgeZoom(ZOOM_STEP);
+        } else if (event.key === "-" || event.key === "_") {
+          event.preventDefault();
+          event.stopPropagation();
+          nudgeZoom(-ZOOM_STEP);
+        } else if (event.key === "0") {
+          event.preventDefault();
+          event.stopPropagation();
+          resetPlacement();
+        }
+      }}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setActive(false);
+        }
+      }}
       onTouchStart={(event) => {
         if (!canEdit || event.touches.length !== 2) return;
         event.stopPropagation();
@@ -155,7 +204,7 @@ export function PhotoFrame({
         pinchRef.current = null;
         commit(latest.current, true);
       }}
-      role="img"
+      role="group"
       aria-label={photo.alt}
     >
       {failed ? (
@@ -182,7 +231,7 @@ export function PhotoFrame({
           className="photo-delete"
           data-album-interact="true"
           aria-label="Delete photograph"
-          onPointerDown={(event) => event.stopPropagation()}
+          onPointerDown={stopControlGesture}
           onClick={(event) => {
             event.stopPropagation();
             onDelete(photo.id);
@@ -190,6 +239,65 @@ export function PhotoFrame({
         >
           <Trash2 size={12} />
         </button>
+      ) : null}
+      {canEdit ? (
+        <div
+          className="photo-zoom-controls"
+          data-album-interact="true"
+          onPointerDown={stopControlGesture}
+          onClick={stopControlGesture}
+        >
+          <button
+            type="button"
+            aria-label="Zoom out"
+            onPointerDown={stopControlGesture}
+            onClick={(event) => {
+              event.stopPropagation();
+              nudgeZoom(-ZOOM_STEP);
+            }}
+          >
+            <Minus size={14} />
+          </button>
+          <input
+            className="photo-zoom-slider"
+            type="range"
+            min={MIN_PHOTO_SCALE}
+            max={MAX_PHOTO_SCALE}
+            step={0.01}
+            value={placement.scale}
+            aria-label="Zoom"
+            onPointerDown={stopControlGesture}
+            onInput={(event) => {
+              commit({ ...latest.current, scale: Number(event.currentTarget.value) }, false);
+            }}
+            onChange={(event) => {
+              commit({ ...latest.current, scale: Number(event.currentTarget.value) });
+            }}
+          />
+          <button
+            type="button"
+            aria-label="Zoom in"
+            onPointerDown={stopControlGesture}
+            onClick={(event) => {
+              event.stopPropagation();
+              nudgeZoom(ZOOM_STEP);
+            }}
+          >
+            <Plus size={14} />
+          </button>
+          <span className="photo-zoom-value">{Math.round(placement.scale * 100)}%</span>
+          <button
+            type="button"
+            aria-label="Reset zoom and position"
+            onPointerDown={stopControlGesture}
+            onClick={(event) => {
+              event.stopPropagation();
+              resetPlacement();
+            }}
+          >
+            <RotateCcw size={13} />
+          </button>
+        </div>
       ) : null}
     </div>
   );
