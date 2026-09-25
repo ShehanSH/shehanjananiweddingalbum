@@ -12,8 +12,7 @@ export default async function AlbumPage({
 }) {
   const params = await searchParams;
   const authed = await isAdminAuthenticated();
-  const preview = params.preview === "1" && authed;
-  const { album, pages } = await loadAlbumBook(preview);
+  const { album, pages } = await loadAlbumBook(authed);
   return (
     <AlbumBook
       pages={pages}

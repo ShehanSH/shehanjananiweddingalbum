@@ -12,8 +12,7 @@ export default async function WeddingDayPage({
 }) {
   const params = await searchParams;
   const authed = await isAdminAuthenticated();
-  const preview = params.preview === "1" && authed;
-  const { album, pages } = await loadAlbumBook(preview);
+  const { album, pages } = await loadAlbumBook(authed);
   const sectionStart = Math.max(
     0,
     pages.findIndex((page) => page.sectionSlug === "wedding-day" && page.type === "SECTION_INTRO"),

@@ -7,6 +7,7 @@ import { deletePhotoFile, localUploadDir } from "../blob/storage";
 import { readdir, unlink } from "fs/promises";
 import path from "path";
 import { ensureDefaultSections } from "./sections";
+import { syncPublishedAlbumFromDraft } from "./syncPublished";
 
 export async function getAlbumByStatus(status: string) {
   return prisma.album.findFirst({
@@ -211,7 +212,13 @@ export async function publishAlbum(draftId?: string) {
     throw new Error("No draft album to publish.");
   }
 
-  const published = await prisma.album.create({
+  const existing = await getPublishedAlbum();
+  if (existing) {
+    await syncPublishedAlbumFromDraft(draft.id);
+    return getPublishedAlbum();
+  }
+
+  return prisma.album.create({
     data: {
       status: ALBUM_STATUS.PUBLISHED,
       version: draft.version,
@@ -232,6 +239,4 @@ export async function publishAlbum(draftId?: string) {
     },
     include: { pages: { orderBy: { pageNumber: "asc" }, include: { section: true } } },
   });
-
-  return published;
 }

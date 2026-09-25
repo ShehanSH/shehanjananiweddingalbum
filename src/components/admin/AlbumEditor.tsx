@@ -421,7 +421,7 @@ export function AlbumEditor({
       </div>
       {message ? <p className="text-sm text-sage-deep">{message}</p> : null}
       <p className="text-sm text-brown-soft">
-        Draft version {draft?.version ?? "—"} · {bookPages.length} album pages in two parts: Couple Shoot and Wedding Function. Click or drag photographs onto a numbered frame, then save.
+        Draft version {draft?.version ?? "—"} · {bookPages.length} album pages in two parts: Couple Shoot and Wedding Function. Click or drag photographs onto a numbered frame, then save. Guests see the last published album until you click Publish.
       </p>
 
       <ul className="space-y-4">

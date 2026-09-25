@@ -6,7 +6,6 @@ import { padImageSlots } from "../album/bookPageNumbers";
 import type { BookPageType } from "./book";
 import { assembleBook } from "./book";
 import { deletePhotoRecord } from "./photos";
-import { syncPublishedAlbumFromDraft } from "./syncPublished";
 
 export async function updatePage(
   id: string,
@@ -30,7 +29,6 @@ export async function updatePage(
       isManuallyEdited: data.isManuallyEdited ?? true,
     },
   });
-  await syncPublishedAlbumFromDraft(page.albumId);
   return page;
 }
 
@@ -43,7 +41,6 @@ export async function reorderPages(albumId: string, orderedIds: string[]) {
       }),
     ),
   );
-  await syncPublishedAlbumFromDraft(albumId);
   return assembleBook(albumId);
 }
 
@@ -71,7 +68,6 @@ export async function movePhotoPage(pageId: string, direction: "up" | "down") {
       data: { pageNumber: page.pageNumber, isManuallyEdited: true },
     }),
   ]);
-  await syncPublishedAlbumFromDraft(page.albumId);
   return assembleBook(page.albumId);
 }
 
@@ -222,7 +218,6 @@ export async function createEmptyPhotoPage(options: {
     });
   }
 
-  await syncPublishedAlbumFromDraft(options.albumId);
   return assembleBook(options.albumId);
 }
 
@@ -235,6 +230,5 @@ export async function deletePhotoPage(pageId: string) {
     where: { albumId: page.albumId, pageNumber: { gt: page.pageNumber } },
     data: { pageNumber: { decrement: 1 } },
   });
-  await syncPublishedAlbumFromDraft(page.albumId);
   return assembleBook(page.albumId);
 }

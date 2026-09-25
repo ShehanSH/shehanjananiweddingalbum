@@ -26,7 +26,7 @@ export function AlbumPageRenderer({
   onPhotoTransform?: (photoId: string, next: PhotoPlacement) => void;
   onDeletePhoto?: (photoId: string) => void;
 }) {
-  const interactive = true;
+  const interactive = editable;
   let content = (
     <div className="album-page">
       {page.layoutType ? (

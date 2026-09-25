@@ -48,14 +48,6 @@ export async function POST(request: Request) {
       data,
     });
 
-    const published = await getPublishedAlbum();
-    if (published) {
-      await prisma.album.update({
-        where: { id: published.id },
-        data,
-      });
-    }
-
     return NextResponse.json(updated);
   }
 

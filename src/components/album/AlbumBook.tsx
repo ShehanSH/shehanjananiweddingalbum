@@ -59,6 +59,7 @@ export function AlbumBook({
   const [toc, setToc] = useState(false);
   const [copied, setCopied] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
@@ -92,6 +93,33 @@ export function AlbumBook({
       Object.values(transformTimers.current).forEach((id) => window.clearTimeout(id));
     };
   }, []);
+
+  async function publishAlbum() {
+    if (!editable || !albumId || publishing) return;
+    setPublishing(true);
+    setUploadMessage("Publishing album…");
+    try {
+      const response = await fetch("/api/admin/album", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "publish", draftId: albumId }),
+      });
+      if (!response.ok) throw new Error("Publish failed.");
+      setUploadMessage("Album published. Guests can now see these pages.");
+      router.refresh();
+    } catch (error) {
+      setUploadMessage(error instanceof Error ? error.message : "Publish failed.");
+    } finally {
+      setPublishing(false);
+      window.setTimeout(() => setUploadMessage(""), 2800);
+    }
+  }
+
+  async function signOut() {
+    await fetch("/api/admin/logout", { method: "POST" });
+    router.push("/");
+    router.refresh();
+  }
 
   async function share() {
     const payload = { title: SITE.title, text: SITE.shareMessage, url: window.location.href };
@@ -277,6 +305,25 @@ export function AlbumBook({
         </button>
         <p className="hidden font-script text-2xl sm:block">Shehan & Janani</p>
         <div className="flex shrink-0 items-center gap-3 sm:gap-4">
+          {editable ? (
+            <>
+              <button
+                type="button"
+                onClick={() => void publishAlbum()}
+                disabled={publishing}
+                className="rounded-full bg-brown px-3 py-1.5 text-[10px] tracking-[0.16em] uppercase text-ivory disabled:opacity-50 sm:px-4 sm:text-[11px]"
+              >
+                {publishing ? "Publishing…" : "Publish"}
+              </button>
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className="text-[10px] tracking-[0.16em] uppercase text-brown-soft hover:text-brown sm:text-[11px]"
+              >
+                Sign out
+              </button>
+            </>
+          ) : null}
           <button
             type="button"
             onClick={() => void toggleFullscreen()}

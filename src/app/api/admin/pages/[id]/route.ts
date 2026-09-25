@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/database/client";
 import { assembleBook } from "@/lib/database/book";
-import { syncPublishedAlbumFromDraft } from "@/lib/database/syncPublished";
 import { updatePage, reorderPages } from "@/lib/database/pages";
 
 export async function PATCH(
@@ -29,7 +28,6 @@ export async function DELETE(
     where: { albumId: page.albumId, pageNumber: { gt: page.pageNumber } },
     data: { pageNumber: { decrement: 1 } },
   });
-  await syncPublishedAlbumFromDraft(page.albumId);
   const pages = await assembleBook(page.albumId);
   return NextResponse.json({ pages });
 }
