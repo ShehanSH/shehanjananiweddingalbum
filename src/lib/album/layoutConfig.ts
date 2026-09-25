@@ -1,4 +1,4 @@
-export const PAGE_FLIP_DURATION = 1080;
+export const PAGE_FLIP_DURATION = 1320;
 
 export const MIN_IMAGE_AREA_DESKTOP = 72000;
 export const MIN_IMAGE_AREA_TABLET = 56000;
@@ -11,8 +11,8 @@ export const PAGE_CONTENT = {
 } as const;
 
 export const SOUND_STORAGE_KEY = "albumSoundEnabled";
-export const PAGE_FLIP_SOUND_SRC = "/sounds/page-linen.wav";
-export const PAGE_FLIP_SOUND_FALLBACK = "/sounds/page-leaf.wav";
+export const PAGE_FLIP_SOUND_SRC = "/sounds/page-soft.wav";
+export const PAGE_FLIP_SOUND_FALLBACK = "/sounds/page-linen.wav";
 
 export const SPREAD_BREAKPOINT = 1024;
 export const SWIPE_THRESHOLD = 56;

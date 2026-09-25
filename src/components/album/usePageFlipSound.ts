@@ -21,7 +21,7 @@ export function usePageFlipSound() {
   useEffect(() => {
     const audio = new Audio();
     audio.preload = "auto";
-    audio.volume = 0.36;
+    audio.volume = 0.28;
     audio.src = PAGE_FLIP_SOUND_SRC;
     const fallback = () => {
       if (!audio.src.includes(PAGE_FLIP_SOUND_FALLBACK)) {
@@ -31,6 +31,7 @@ export function usePageFlipSound() {
     audio.addEventListener("error", fallback);
     audioRef.current = audio;
     return () => {
+      audio.removeEventListener("error", fallback);
       audio.pause();
       audioRef.current = null;
     };
@@ -47,7 +48,10 @@ export function usePageFlipSound() {
     const audio = audioRef.current;
     if (!audio) return;
     try {
+      audio.pause();
       audio.currentTime = 0;
+      audio.playbackRate = 0.96 + Math.random() * 0.08;
+      audio.volume = 0.24 + Math.random() * 0.08;
       void audio.play().catch(() => undefined);
     } catch {
       /* blocked or missing */

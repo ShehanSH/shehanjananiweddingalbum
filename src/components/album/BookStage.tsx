@@ -109,7 +109,7 @@ export function BookStage({
         className="book-stage"
         style={{ ["--page-flip-duration" as string]: `${duration}ms` }}
       >
-        <div className={cn("book-cover-wrap", (opening || closing) && "is-animating")}>
+        <div className={cn("book-cover-wrap", (opening || closing) && "is-animating is-flipping")}>
           <div className="book-cover-shadow" />
           <div
             className={cn(
@@ -165,7 +165,7 @@ export function BookStage({
       style={{ ["--page-flip-duration" as string]: `${duration}ms` }}
     >
       <div
-        className={cn("book-body", single ? "book-single" : "book-spread")}
+        className={cn("book-body", single ? "book-single" : "book-spread", isFlipping && "is-flipping")}
         onClick={handleMarginFlip}
       >
         <div className={cn("book-page-slot", !single && "book-page-left")}>
@@ -192,11 +192,13 @@ export function BookStage({
               <PageView
                 page={single ? currentLeft : flipDirection === "next" ? currentRight : currentLeft}
               />
+              <div className="flip-curl" />
             </div>
             <div className="flip-face flip-back">
               <PageView
                 page={single ? incomingLeft : flipDirection === "next" ? incomingLeft : incomingRight}
               />
+              <div className="flip-curl" />
             </div>
           </div>
         ) : null}
