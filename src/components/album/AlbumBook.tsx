@@ -35,6 +35,7 @@ export function AlbumBook({
   const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState("");
   const transformTimers = useRef<Record<string, number>>({});
+  const pendingPlacements = useRef<Record<string, PhotoPlacement>>({});
 
   useEffect(() => {
     setBookPages(pages);
@@ -100,6 +101,7 @@ export function AlbumBook({
     setPublishing(true);
     setUploadMessage("Publishing album…");
     try {
+      await flushPendingPlacements();
       const response = await fetch("/api/admin/album", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -186,14 +188,29 @@ export function AlbumBook({
   function handlePhotoTransform(photoId: string, next: PhotoPlacement) {
     applyPlacement(photoId, next);
     if (!editable) return;
+    pendingPlacements.current[photoId] = next;
     window.clearTimeout(transformTimers.current[photoId]);
     transformTimers.current[photoId] = window.setTimeout(() => {
-      void fetch(`/api/admin/photos/${photoId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(next),
-      });
+      void persistPlacement(photoId, next);
     }, 420);
+  }
+
+  async function persistPlacement(photoId: string, next: PhotoPlacement) {
+    window.clearTimeout(transformTimers.current[photoId]);
+    delete transformTimers.current[photoId];
+    const response = await fetch(`/api/admin/photos/${photoId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(next),
+    });
+    if (response.ok && pendingPlacements.current[photoId] === next) {
+      delete pendingPlacements.current[photoId];
+    }
+  }
+
+  async function flushPendingPlacements() {
+    const pending = Object.entries(pendingPlacements.current);
+    await Promise.all(pending.map(([photoId, next]) => persistPlacement(photoId, next)));
   }
 
   async function handleDropFiles(page: BookPage, files: FileList, slotIndex?: number) {
@@ -345,7 +362,7 @@ export function AlbumBook({
 
       {editable ? (
         <p className="mx-auto mb-3 hidden max-w-6xl text-center text-[10px] tracking-[0.16em] uppercase text-brown-soft sm:mb-3 sm:block sm:text-[11px]">
-          Drop photographs onto a marked area · Tap the trash icon to delete
+          Drop photographs onto a marked area · Pinch or scroll to zoom · Drag to place · Tap the trash icon to delete
         </p>
       ) : null}
       {uploadMessage ? (
