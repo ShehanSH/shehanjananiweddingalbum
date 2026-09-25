@@ -1,5 +1,6 @@
 "use client";
 
+import { uploadAlbumPhoto } from "@/lib/blob/clientUpload";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "../ui/Button";
 
@@ -13,22 +14,6 @@ type UploadItem = {
   preview: string;
   abort?: AbortController;
 };
-
-function readDimensions(file: File): Promise<{ width: number; height: number }> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    const url = URL.createObjectURL(file);
-    image.onload = () => {
-      resolve({ width: image.naturalWidth, height: image.naturalHeight });
-      URL.revokeObjectURL(url);
-    };
-    image.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Could not read image"));
-    };
-    image.src = url;
-  });
-}
 
 export function PhotoUploader({
   sections,
@@ -49,21 +34,10 @@ export function PhotoUploader({
 
   async function uploadOne(item: UploadItem) {
     try {
-      const dims = await readDimensions(item.file);
-      const body = new FormData();
-      body.append("file", item.file);
-      body.append("sectionId", sectionId);
-      body.append("width", String(dims.width));
-      body.append("height", String(dims.height));
-      const controller = new AbortController();
       setItems((current) =>
-        current.map((entry) => (entry.id === item.id ? { ...entry, abort: controller, progress: 15 } : entry)),
+        current.map((entry) => (entry.id === item.id ? { ...entry, progress: 15 } : entry)),
       );
-      const response = await fetch("/api/upload", { method: "POST", body, signal: controller.signal });
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || "Upload failed");
-      }
+      await uploadAlbumPhoto(item.file, sectionId);
       setItems((current) => current.map((entry) => (entry.id === item.id ? { ...entry, progress: 100 } : entry)));
     } catch (error) {
       const message = error instanceof Error ? error.message : "Upload failed";

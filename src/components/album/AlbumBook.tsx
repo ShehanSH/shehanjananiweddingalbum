@@ -11,7 +11,8 @@ import { SITE } from "@/lib/constants";
 import { EmptyState } from "../ui/EmptyState";
 import { SWIPE_THRESHOLD } from "@/lib/album/layoutConfig";
 import { albumDisplayPage, persistAlbumPageInUrl } from "@/lib/album/pagePosition";
-import { isAlbumInteractTarget, readImageDimensions } from "@/lib/album/photoPlacement";
+import { uploadAlbumPhoto } from "@/lib/blob/clientUpload";
+import { isAlbumInteractTarget } from "@/lib/album/photoPlacement";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BookOpen, Maximize2, Minimize2, Share2, Volume2, VolumeX } from "lucide-react";
@@ -206,18 +207,7 @@ export function AlbumBook({
     try {
       const photoIds: string[] = [];
       for (const file of images) {
-        const dims = await readImageDimensions(file);
-        const body = new FormData();
-        body.append("file", file);
-        if (page.sectionId) body.append("sectionId", page.sectionId);
-        body.append("width", String(dims.width));
-        body.append("height", String(dims.height));
-        const response = await fetch("/api/upload", { method: "POST", body });
-        if (!response.ok) {
-          const data = await response.json().catch(() => ({}));
-          throw new Error(data.error || "Upload failed");
-        }
-        const photo = await response.json();
+        const photo = await uploadAlbumPhoto(file, page.sectionId || undefined);
         photoIds.push(photo.id);
       }
 

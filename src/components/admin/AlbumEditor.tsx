@@ -3,7 +3,7 @@
 import { LAYOUT_LIBRARY, LAYOUT_TYPES, type LayoutType } from "@/lib/album/layoutTypes";
 import { layoutDensityWarning } from "@/lib/album/layoutQuality";
 import { padImageSlots } from "@/lib/album/bookPageNumbers";
-import { readImageDimensions } from "@/lib/album/photoPlacement";
+import { uploadAlbumPhoto } from "@/lib/blob/clientUpload";
 import type { BookPage } from "@/lib/database/book";
 import { Button } from "../ui/Button";
 import { Modal } from "../ui/Modal";
@@ -314,18 +314,7 @@ export function AlbumEditor({
         `Uploading to page ${String(page.pageNumber).padStart(2, "0")}, area ${targetIndex + 1}…`,
       );
       try {
-        const dims = await readImageDimensions(file);
-        const body = new FormData();
-        body.append("file", file);
-        if (page.sectionId) body.append("sectionId", page.sectionId);
-        body.append("width", String(dims.width));
-        body.append("height", String(dims.height));
-        const response = await fetch("/api/upload", { method: "POST", body });
-        if (!response.ok) {
-          const data = await response.json().catch(() => ({}));
-          throw new Error(data.error || "Upload failed");
-        }
-        const photo = await response.json();
+        const photo = await uploadAlbumPhoto(file, page.sectionId || undefined);
         setLocalPhotos((current) => [...current, photo]);
         next[targetIndex] = photo.id;
         setPageEdit(page, { imageIds: [...next] });
