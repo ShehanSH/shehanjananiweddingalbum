@@ -12,6 +12,7 @@ import { SWIPE_THRESHOLD } from "@/lib/album/layoutConfig";
 import { albumDisplayPage, persistAlbumPageInUrl } from "@/lib/album/pagePosition";
 import { uploadAlbumPhoto } from "@/lib/blob/clientUpload";
 import { isAlbumInteractTarget } from "@/lib/album/photoPlacement";
+import { albumPhotoSrc, albumPhotoSrcSet, prefetchAlbumPhoto } from "@/lib/album/photoUrl";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BookOpen, Maximize2, Minimize2, Share2 } from "lucide-react";
@@ -64,13 +65,10 @@ export function AlbumBook({
 
   useEffect(() => {
     const nearby = bookPages
-      .slice(Math.max(0, currentPage - 2), currentPage + 5)
+      .slice(Math.max(0, currentPage - 1), currentPage + 7)
       .flatMap((page) => page.images)
       .filter((photo): photo is NonNullable<typeof photo> => Boolean(photo));
-    nearby.forEach((photo) => {
-      const image = new window.Image();
-      image.src = photo.thumbnailUrl;
-    });
+    nearby.forEach((photo) => prefetchAlbumPhoto(photo));
   }, [currentPage, bookPages]);
 
   useEffect(() => {
@@ -293,11 +291,27 @@ export function AlbumBook({
   const displayCurrent = opened ? currentPage + 1 : 1;
   const displayTotal = bookPages.length;
 
+  const preloadPhotos = bookPages
+    .slice(currentPage, currentPage + 2)
+    .flatMap((page) => page.images)
+    .filter((photo): photo is NonNullable<typeof photo> => Boolean(photo))
+    .slice(0, 6);
+
   return (
     <div
       ref={stageRef}
       className="album-shell paper-canvas min-h-dvh overflow-x-hidden px-0 py-0 sm:px-6 sm:py-6"
     >
+      {preloadPhotos.map((photo) => (
+        <link
+          key={`preload-${photo.id}`}
+          rel="preload"
+          as="image"
+          href={albumPhotoSrc(photo)}
+          imageSrcSet={albumPhotoSrcSet(photo)}
+          imageSizes="(max-width: 640px) 100vw, 42vw"
+        />
+      ))}
       <header className="album-header mx-auto mb-3 flex w-full max-w-6xl min-w-0 items-center justify-between gap-2 text-brown sm:mb-4">
         <button
           type="button"

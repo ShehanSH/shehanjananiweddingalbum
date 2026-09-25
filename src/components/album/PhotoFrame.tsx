@@ -1,6 +1,7 @@
 "use client";
 
 import type { BookPhoto } from "@/lib/database/book";
+import { albumPhotoSrc, albumPhotoSrcSet } from "@/lib/album/photoUrl";
 import {
   clampPlacement,
   MAX_PHOTO_SCALE,
@@ -214,11 +215,23 @@ export function PhotoFrame({
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={photo.thumbnailUrl || photo.url}
+          src={albumPhotoSrc(photo)}
+          srcSet={albumPhotoSrcSet(photo)}
+          sizes="(max-width: 640px) 100vw, 42vw"
           alt={photo.alt}
           loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "low"}
           decoding="async"
-          onError={() => setFailed(true)}
+          onError={(event) => {
+            const image = event.currentTarget;
+            const original = photo.thumbnailUrl || photo.url;
+            if (original && image.src !== original) {
+              image.srcset = "";
+              image.src = original;
+              return;
+            }
+            setFailed(true);
+          }}
           draggable={false}
           style={{
             transform: `translate(${placement.offsetX}%, ${placement.offsetY}%) scale(${placement.scale})`,
