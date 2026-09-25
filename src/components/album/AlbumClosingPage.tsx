@@ -20,11 +20,11 @@ export function AlbumClosingPage({
   onDelete?: (photoId: string) => void;
 }) {
   return (
-    <div className="album-page flex h-full flex-col items-center justify-center px-5 text-center sm:px-8">
-      <FloralAccent className="mb-6 h-12 w-12 text-sage/60" />
-      <p className="max-w-sm font-serif text-3xl leading-relaxed text-brown">{INTRO_COPY.closing}</p>
+    <div className="album-page album-closing-page flex h-full min-h-0 flex-col items-center justify-center px-5 text-center sm:px-8">
+      <FloralAccent className="mb-3 h-8 w-8 shrink-0 text-sage/60 sm:mb-6 sm:h-12 sm:w-12" />
+      <p className="max-w-sm shrink-0 font-serif text-2xl leading-relaxed text-brown sm:text-3xl">{INTRO_COPY.closing}</p>
       {photo ? (
-        <div className="mt-8 h-44 w-32 overflow-hidden">
+        <div className="album-closing-photo mt-5 w-[min(78%,20rem)] min-h-[16rem] h-[min(48%,26rem)] max-h-[48%] overflow-hidden sm:mt-8">
           <PhotoFrame
             photo={photo}
             interactive={interactive}
@@ -34,12 +34,12 @@ export function AlbumClosingPage({
           />
         </div>
       ) : null}
-      <p className="mt-8 text-xs tracking-[0.28em] uppercase text-soft-gray">{INTRO_COPY.withLove}</p>
-      <p className="mt-3 font-script text-4xl text-brown">
+      <p className="mt-5 shrink-0 text-xs tracking-[0.28em] uppercase text-soft-gray sm:mt-8">{INTRO_COPY.withLove}</p>
+      <p className="mt-3 shrink-0 font-script text-4xl text-brown">
         {COUPLE.groom} & {COUPLE.bride}
       </p>
-      <p className="mt-5 text-[11px] tracking-[0.28em] uppercase text-brown-soft">{COUPLE.weddingDate}</p>
-      <p className="mt-2 text-[11px] tracking-[0.2em] uppercase text-soft-gray">
+      <p className="mt-4 shrink-0 text-[11px] tracking-[0.28em] uppercase text-brown-soft sm:mt-5">{COUPLE.weddingDate}</p>
+      <p className="mt-2 shrink-0 text-[11px] tracking-[0.2em] uppercase text-soft-gray">
         {COUPLE.venue}, {COUPLE.venueCity}
       </p>
     </div>
