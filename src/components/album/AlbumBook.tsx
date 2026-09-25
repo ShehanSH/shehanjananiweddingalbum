@@ -6,7 +6,6 @@ import { AlbumNavigation } from "./AlbumNavigation";
 import { AlbumTableOfContents } from "./AlbumTableOfContents";
 import { BookStage } from "./BookStage";
 import { useAlbumNavigation, useBookMode } from "./useAlbumNavigation";
-import { usePageFlipSound } from "./usePageFlipSound";
 import { SITE } from "@/lib/constants";
 import { EmptyState } from "../ui/EmptyState";
 import { SWIPE_THRESHOLD } from "@/lib/album/layoutConfig";
@@ -15,7 +14,7 @@ import { uploadAlbumPhoto } from "@/lib/blob/clientUpload";
 import { isAlbumInteractTarget } from "@/lib/album/photoPlacement";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen, Maximize2, Minimize2, Share2, Volume2, VolumeX } from "lucide-react";
+import { BookOpen, Maximize2, Minimize2, Share2 } from "lucide-react";
 
 export function AlbumBook({
   pages,
@@ -30,7 +29,6 @@ export function AlbumBook({
 }) {
   const router = useRouter();
   const mode = useBookMode();
-  const { enabled: soundEnabled, setSoundEnabled, play } = usePageFlipSound();
   const [bookPages, setBookPages] = useState(pages);
   const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState("");
@@ -45,7 +43,6 @@ export function AlbumBook({
     pageCount: bookPages.length,
     startAt,
     mode,
-    onFlip: play,
   });
   const {
     currentPage,
@@ -339,15 +336,6 @@ export function AlbumBook({
             aria-pressed={fullscreen}
           >
             {fullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-          </button>
-          <button
-            type="button"
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className="text-brown-soft hover:text-brown"
-            aria-label="Toggle page flip sound"
-            aria-pressed={soundEnabled}
-          >
-            {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
           </button>
           <button
             type="button"
