@@ -1,25 +1,15 @@
 "use client";
 
 import type { BookPhoto } from "@/lib/database/book";
-import {
-  clampPlacement,
-  normalizePlacement,
-  type PhotoPlacement,
-} from "@/lib/album/photoPlacement";
+import { normalizePlacement, type PhotoPlacement } from "@/lib/album/photoPlacement";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-
-function isPhotoControl(target: EventTarget | null) {
-  return Boolean(target instanceof Element && target.closest("button, .photo-delete"));
-}
+import { useEffect, useState } from "react";
 
 export function PhotoFrame({
   photo,
   className,
   priority = false,
-  interactive: _interactive = false,
-  onTransform,
   onDelete,
 }: {
   photo: BookPhoto;
@@ -32,140 +22,13 @@ export function PhotoFrame({
 }) {
   const [failed, setFailed] = useState(false);
   const [placement, setPlacement] = useState(() => normalizePlacement(photo));
-  const [dragging, setDragging] = useState(false);
-  const frameRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<{
-    x: number;
-    y: number;
-    ox: number;
-    oy: number;
-    moved: boolean;
-  } | null>(null);
-  const pinchRef = useRef<{ distance: number; scale: number } | null>(null);
-  const latest = useRef(placement);
-  latest.current = placement;
-  const canPersist = Boolean(onTransform);
 
   useEffect(() => {
     setPlacement(normalizePlacement(photo));
   }, [photo.id, photo.offsetX, photo.offsetY, photo.scale]);
 
-  useEffect(() => {
-    const node = frameRef.current;
-    if (!node) return;
-    const onWheel = (event: WheelEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-      commit({ ...latest.current, scale: latest.current.scale - event.deltaY * 0.0016 }, canPersist);
-    };
-    node.addEventListener("wheel", onWheel, { passive: false });
-    return () => node.removeEventListener("wheel", onWheel);
-  }, [canPersist]);
-
-  function commit(next: PhotoPlacement, persist = canPersist) {
-    const clamped = clampPlacement(next);
-    setPlacement(clamped);
-    latest.current = clamped;
-    if (persist) onTransform?.(photo.id, clamped);
-  }
-
-  function canPan() {
-    return canPersist || latest.current.scale > 1.05;
-  }
-
-  function pointerDistance(event: React.TouchEvent) {
-    const [a, b] = Array.from(event.touches);
-    if (!a || !b) return 0;
-    return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
-  }
-
   return (
-    <div
-      ref={frameRef}
-      data-album-interact={canPan() || pinchRef.current ? "true" : undefined}
-      className={cn("photo-frame group is-zoomable", dragging && "is-dragging", className)}
-      onPointerDown={(event) => {
-        if (!canPan()) return;
-        if (isPhotoControl(event.target)) return;
-        if (event.pointerType === "mouse" && event.button !== 0) return;
-        event.stopPropagation();
-        frameRef.current?.setPointerCapture(event.pointerId);
-        dragRef.current = {
-          x: event.clientX,
-          y: event.clientY,
-          ox: latest.current.offsetX,
-          oy: latest.current.offsetY,
-          moved: false,
-        };
-        setDragging(true);
-      }}
-      onPointerMove={(event) => {
-        if (!dragRef.current) return;
-        event.preventDefault();
-        const dx = event.clientX - dragRef.current.x;
-        const dy = event.clientY - dragRef.current.y;
-        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragRef.current.moved = true;
-        const rect = frameRef.current?.getBoundingClientRect();
-        if (!rect?.width || !rect.height) return;
-        commit(
-          {
-            ...latest.current,
-            offsetX: dragRef.current.ox + (dx / rect.width) * 100,
-            offsetY: dragRef.current.oy + (dy / rect.height) * 100,
-          },
-          false,
-        );
-      }}
-      onPointerUp={() => {
-        const moved = dragRef.current?.moved;
-        dragRef.current = null;
-        setDragging(false);
-        if (moved) commit(latest.current, canPersist);
-      }}
-      onPointerCancel={() => {
-        dragRef.current = null;
-        setDragging(false);
-      }}
-      onDoubleClick={(event) => {
-        if (isPhotoControl(event.target)) return;
-        event.preventDefault();
-        event.stopPropagation();
-        const current = latest.current.scale;
-        commit({
-          ...latest.current,
-          scale: current >= 2.2 ? 1 : current + 0.45,
-        });
-      }}
-      onTouchStart={(event) => {
-        if (event.touches.length !== 2) return;
-        event.stopPropagation();
-        pinchRef.current = {
-          distance: pointerDistance(event),
-          scale: latest.current.scale,
-        };
-      }}
-      onTouchMove={(event) => {
-        if (!pinchRef.current || event.touches.length !== 2) return;
-        event.preventDefault();
-        event.stopPropagation();
-        const distance = pointerDistance(event);
-        if (!pinchRef.current.distance) return;
-        commit(
-          {
-            ...latest.current,
-            scale: pinchRef.current.scale * (distance / pinchRef.current.distance),
-          },
-          false,
-        );
-      }}
-      onTouchEnd={() => {
-        if (!pinchRef.current) return;
-        pinchRef.current = null;
-        commit(latest.current, canPersist);
-      }}
-      role="img"
-      aria-label={photo.alt}
-    >
+    <div className={cn("photo-frame group", className)} role="img" aria-label={photo.alt}>
       {failed ? (
         <div className="flex h-full w-full items-center justify-center bg-cream text-sm text-soft-gray">
           Photograph unavailable
