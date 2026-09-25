@@ -24,9 +24,7 @@ export function AlbumCover({
       <FloralCorner className="pointer-events-none absolute left-4 top-4 hidden h-24 w-24 text-sage/50 sm:block" />
       <FloralCorner className="pointer-events-none absolute bottom-4 right-4 hidden h-24 w-24 rotate-180 text-sage/50 sm:block" />
 
-      <p className="album-cover-kicker shrink-0 text-[10px] tracking-[0.42em] uppercase text-sage-deep sm:text-[11px]">
-        The Wedding Album
-      </p>
+      <p className="album-cover-kicker shrink-0">The Wedding Album</p>
 
       <h1 className="mt-3 shrink-0 font-script text-4xl text-brown sm:mt-5 sm:text-7xl">{COUPLE.groom}</h1>
       <p className="album-cover-amp my-1 shrink-0 font-serif text-lg text-blush sm:my-2 sm:text-2xl">&</p>

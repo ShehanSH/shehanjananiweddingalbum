@@ -26,7 +26,7 @@ export function AlbumPageRenderer({
   onPhotoTransform?: (photoId: string, next: PhotoPlacement) => void;
   onDeletePhoto?: (photoId: string) => void;
 }) {
-  const interactive = editable;
+  const interactive = true;
   let content = (
     <div className="album-page">
       {page.layoutType ? (
@@ -38,7 +38,7 @@ export function AlbumPageRenderer({
           priority={priority}
           interactive={interactive}
           editable={editable}
-          onTransform={onPhotoTransform}
+          onTransform={editable ? onPhotoTransform : undefined}
           onDelete={editable ? onDeletePhoto : undefined}
           onDropFiles={onDropFiles}
         />
@@ -62,7 +62,7 @@ export function AlbumPageRenderer({
         photo={page.images[0] ?? undefined}
         interactive={interactive}
         onOpen={onOpen}
-        onTransform={onPhotoTransform}
+        onTransform={editable ? onPhotoTransform : undefined}
         onDelete={editable ? onDeletePhoto : undefined}
       />
     );
@@ -82,7 +82,7 @@ export function AlbumPageRenderer({
         photo={page.images[0] ?? undefined}
         interactive={interactive}
         onOpen={onOpen}
-        onTransform={onPhotoTransform}
+        onTransform={editable ? onPhotoTransform : undefined}
         onDelete={editable ? onDeletePhoto : undefined}
       />
     );

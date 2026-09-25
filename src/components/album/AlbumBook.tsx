@@ -345,7 +345,7 @@ export function AlbumBook({
 
       {editable ? (
         <p className="mx-auto mb-3 hidden max-w-6xl text-center text-[10px] tracking-[0.16em] uppercase text-brown-soft sm:mb-3 sm:block sm:text-[11px]">
-          Drop photographs onto a marked area · Use +/−, the slider, scroll, pinch, or double-click to zoom · Drag to place · Tap the trash icon to delete
+          Drop photographs onto a marked area · Pinch or scroll to zoom · Drag to place · Tap the trash icon to delete
         </p>
       ) : null}
       {uploadMessage ? (
@@ -355,7 +355,7 @@ export function AlbumBook({
       <div
         className="album-stage-wrap mx-auto w-full max-w-6xl touch-pan-y"
         onTouchStart={(event) => {
-          if (isAlbumInteractTarget(event.target)) {
+          if (event.touches.length > 1 || isAlbumInteractTarget(event.target)) {
             touchStart.current = null;
             return;
           }
