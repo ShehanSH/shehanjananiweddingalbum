@@ -24,7 +24,7 @@ export function AlbumClosingPage({
       <FloralAccent className="mb-3 h-8 w-8 shrink-0 text-sage/60 sm:mb-6 sm:h-12 sm:w-12" />
       <p className="max-w-sm shrink-0 font-serif text-2xl leading-relaxed text-brown sm:text-3xl">{INTRO_COPY.closing}</p>
       {photo ? (
-        <div className="album-closing-photo mt-5 w-[min(78%,20rem)] min-h-[16rem] h-[min(48%,26rem)] max-h-[48%] overflow-hidden sm:mt-8">
+        <div className="album-closing-photo mt-5 sm:mt-8">
           <PhotoFrame
             photo={photo}
             interactive={interactive}
